@@ -1,0 +1,118 @@
+@use "sass:math";
+@use "sass:string";
+@use "sass:map";
+
+/* -----------------------------
+   Função para gerar box-shadow
+------------------------------ */
+@function multiple-box-shadow($n, $max-width, $max-height) {
+  // Remove a unidade px para math.random
+  $max-w: math.div($max-width, 1px);
+  $max-h: math.div($max-height, 1px);
+
+  $value: "#{math.random($max-w) * 1px} #{math.random($max-h) * 1px} #FFF";
+
+  @for $i from 2 through $n {
+    $value: "#{$value}, #{math.random($max-w) * 1px} #{math.random($max-h) * 1px} #FFF";
+  }
+
+  @return string.unquote($value);
+}
+
+/* -----------------------------
+   Mixin para criar estrelas
+------------------------------ */
+@mixin create-stars($id, $size, $count, $anim-duration, $max-width, $max-height) {
+  ##{$id} {
+    width: #{$size}px;
+    height: #{$size}px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: transparent;
+    box-shadow: multiple-box-shadow($count, $max-width, $max-height);
+    animation: animStar-#{$id} #{$anim-duration}s linear infinite;
+
+    &:after {
+      content: " ";
+      position: absolute;
+      top: #{$max-height};
+      width: #{$size}px;
+      height: #{$size}px;
+      background: transparent;
+      box-shadow: multiple-box-shadow($count, $max-width, $max-height);
+    }
+  }
+
+  /* Animação específica para cada camada */
+  @keyframes animStar-#{$id} {
+    from {
+      transform: translateY(0px);
+    }
+    to {
+      transform: translateY(-#{$max-height});
+    }
+  }
+}
+
+/* -----------------------------
+   Starfield container
+------------------------------ */
+.starfield {
+  position: fixed; 
+  width: 100%;
+  height: 100%;
+  inset: 0;        
+  background: radial-gradient(ellipse at bottom, #180825 0%, #0d090f 100%);
+  overflow: hidden;
+  z-index: -1; 
+}
+
+/* -----------------------------
+   Breakpoints e configurações
+------------------------------ */
+$breakpoints: (
+  "small": ( "width": 1920px, "height": 2000px ),
+  "medium": ( "width": 2560px, "height": 3000px ),
+  "large": ( "width": 3840px, "height": 4000px )
+);
+
+$star-layers: (
+  "stars": ( "size": 1, "count": 700, "duration": 50 ),
+  "stars2": ( "size": 2, "count": 200, "duration": 100 ),
+  "stars3": ( "size": 3, "count": 100, "duration": 150 )
+);
+
+/* -----------------------------
+   Gerar estrelas para cada breakpoint
+------------------------------ */
+@each $bp-name, $bp-values in $breakpoints {
+  $max-width: map.get($bp-values, "width");
+  $max-height: map.get($bp-values, "height");
+
+  @if $bp-name == "small" {
+    @each $layer-name, $layer-values in $star-layers {
+      @include create-stars(
+        $layer-name,
+        map.get($layer-values, "size"),
+        map.get($layer-values, "count"),
+        map.get($layer-values, "duration"),
+        $max-width,
+        $max-height
+      );
+    }
+  }
+
+  @media (min-width: $max-width) {
+    @each $layer-name, $layer-values in $star-layers {
+      @include create-stars(
+        $layer-name,
+        map.get($layer-values, "size"),
+        map.get($layer-values, "count"),
+        map.get($layer-values, "duration"),
+        $max-width,
+        $max-height
+      );
+    }
+  }
+}
