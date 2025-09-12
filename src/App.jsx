@@ -3,6 +3,7 @@ import './styles/_Theme.scss'
 import Background from './components/Background/Background'
 import Navbar from './components/Navbar/Navbar'
 import Home from './pages/Home/Home'
+import About from './pages/About/About'
 
 
 
@@ -14,6 +15,7 @@ function App() {
       <Background />
       <Navbar />
       <Home />
+      <About />
       
     </>
   )
