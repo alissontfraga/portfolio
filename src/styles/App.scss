@@ -1,0 +1,9 @@
+@charset "UTF-8";
+@use "./Theme.scss" as theme;
+@use './reset.scss';
+
+
+body {
+  font-family: 'Oswald', Arial, sans-serif;
+  color: theme.$color-white;
+}
